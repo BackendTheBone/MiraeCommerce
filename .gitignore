@@ -38,3 +38,5 @@ out/
 
 ### Project ###
 src/main/resources/secret.yml
+application-secret.yml
+.gitmessage.txt
