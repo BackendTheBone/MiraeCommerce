@@ -6,10 +6,10 @@ import com.mirae.commerce.member.repository.MemberRepository;
 import com.mirae.commerce.member.exception.MemberExceptionHandler;
 import com.mirae.commerce.mail.service.MailService;
 import com.mirae.commerce.common.config.WebConfig;
-import com.mirae.commerce.member.dto.ConfirmEmailDto;
-import com.mirae.commerce.member.dto.ModifyRequestDto;
-import com.mirae.commerce.member.dto.RegisterRequestDto;
-import com.mirae.commerce.member.dto.WithdrawRequestDto;
+import com.mirae.commerce.member.dto.ConfirmEmailRequest;
+import com.mirae.commerce.member.dto.ModifyRequest;
+import com.mirae.commerce.member.dto.RegisterRequest;
+import com.mirae.commerce.member.dto.WithdrawRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -33,49 +33,49 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member findMember(String username) {
-        return memberRepository.findMemberByUsername(username)
+        return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
     }
 
     @Override
-    public boolean register(RegisterRequestDto registerRequestDto) {
-        if (memberRepository.findMemberByUsername(registerRequestDto.getUsername()).isPresent()) {
+    public boolean register(RegisterRequest registerRequest) {
+        if (memberRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             return false;
         }
 
         try {
             UUID uuid = UUID.randomUUID();
-            emailConfirmationManager.putConfirmation(uuid, registerRequestDto.getUsername());
+            emailConfirmationManager.putConfirmation(uuid, registerRequest.getUsername());
             StringBuilder mailContent = new StringBuilder()
                     .append("<a href=\"")
                     .append(WebConfig.BASE_URL)
                     .append("/member/email-confirm?uuid=")
                     .append(uuid.toString())
                     .append("\">이메일 인증</a>");
-            MimeMessage message = mailService.createMessage(registerRequestDto.getEmail(), "회원가입 인증", mailContent.toString());
+            MimeMessage message = mailService.createMessage(registerRequest.getEmail(), "회원가입 인증", mailContent.toString());
             mailService.sendMail(message);
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
 
-        registerRequestDto.setStatus("Unauthorized");
-        memberRepository.save(registerRequestDto.toEntity());
+        registerRequest.setStatus("Unauthorized");
+        memberRepository.save(registerRequest.toEntity());
         return true;
     }
 
     @Override
-    public boolean modify(ModifyRequestDto modifyRequestDto) {
-        Member member = memberRepository.findMemberByUsername(modifyRequestDto.getUsername())
+    public boolean modify(ModifyRequest modifyRequest) {
+        Member member = memberRepository.findByUsername(modifyRequest.getUsername())
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
-        modifyRequestDto.setMemberId(member.getMemberId());
-        memberRepository.save(modifyRequestDto.toEntity());
+        modifyRequest.setId(member.getId());
+        memberRepository.save(modifyRequest.toEntity());
         return true;
     }
 
     @Override
-    public boolean withdraw(WithdrawRequestDto withdrawRequestDto) {
-        Member member = memberRepository.findMemberByUsername(withdrawRequestDto.getUsername())
+    public boolean withdraw(WithdrawRequest withdrawRequest) {
+        Member member = memberRepository.findByUsername(withdrawRequest.getUsername())
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
         memberRepository.delete(member);
@@ -83,8 +83,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean confirmEmail(ConfirmEmailDto confirmEmailDto) {
-        UUID uuid = UUID.fromString(confirmEmailDto.getUuid());
+    public boolean confirmEmail(ConfirmEmailRequest confirmEmailRequest) {
+        UUID uuid = UUID.fromString(confirmEmailRequest.getUuid());
         String username = emailConfirmationManager.getConfirmation(uuid);
 
         if (username == null) {
@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
         }
         emailConfirmationManager.removeConfirmation(uuid);
 
-        Member member = memberRepository.findMemberByUsername(username)
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
         member.updateStatus("Authorized");

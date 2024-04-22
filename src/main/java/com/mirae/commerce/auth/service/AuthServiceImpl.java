@@ -1,8 +1,8 @@
 package com.mirae.commerce.auth.service;
 
-import com.mirae.commerce.auth.dto.RefreshTokenDto;
-import com.mirae.commerce.auth.dto.LoginRequestDto;
-import com.mirae.commerce.auth.dto.LogoutRequestDto;
+import com.mirae.commerce.auth.dto.RefreshTokenRequest;
+import com.mirae.commerce.auth.dto.LoginRequest;
+import com.mirae.commerce.auth.dto.LogoutRequest;
 import com.mirae.commerce.auth.jwt.Jwt;
 import com.mirae.commerce.auth.jwt.JwtProvider;
 import com.mirae.commerce.auth.jwt.RefreshTokenManager;
@@ -26,11 +26,11 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenManager refreshTokenManager;
 
     @Override
-    public Jwt login(LoginRequestDto loginRequestDto) {
-        Member member = memberRepository.findMemberByUsername(loginRequestDto.getUsername())
+    public Jwt login(LoginRequest loginRequest) {
+        Member member = memberRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
-        if (!member.checkUsernamePassword(loginRequestDto.getUsername(), loginRequestDto.getPassword())) {
+        if (!member.checkUsernamePassword(loginRequest.getUsername(), loginRequest.getPassword())) {
             throw new MemberExceptionHandler(ErrorCode.PASSWORD_NOT_MATCH_ERROR);
         }
 
@@ -44,34 +44,34 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean logout(LogoutRequestDto logoutRequestDto) {
-        refreshTokenManager.removeRefreshToken(logoutRequestDto.getUsername());
+    public boolean logout(LogoutRequest logoutRequest) {
+        refreshTokenManager.removeRefreshToken(logoutRequest.getUsername());
         return true;
     }
 
     @Override
-    public Jwt refreshToken(RefreshTokenDto refreshTokenDto) {
-        String storedRefreshToken = refreshTokenManager.getRefreshToken(refreshTokenDto.getUsername());
+    public Jwt refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        String storedRefreshToken = refreshTokenManager.getRefreshToken(refreshTokenRequest.getUsername());
 
         // TODO : storedRefreshToken null 예외 추가 할 것
         if (storedRefreshToken == null) return null;
 
         try {
-            jwtProvider.getClaims(refreshTokenDto.getRefreshToken());
+            jwtProvider.getClaims(refreshTokenRequest.getRefreshToken());
         } catch (ExpiredJwtException e) {
             throw new JwtExceptionHandler(ErrorCode.EXPIRED_REFRESH_TOKEN_EXCEPTION);
         }
 
-        if (!storedRefreshToken.equals(refreshTokenDto.getRefreshToken())) {
+        if (!storedRefreshToken.equals(refreshTokenRequest.getRefreshToken())) {
             // TODO : refresh token 불일치 예외 추가 할 것
             return null;
         }
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("username", refreshTokenDto.getUsername());
+        claims.put("username", refreshTokenRequest.getUsername());
         Jwt jwt = jwtProvider.createJwt(claims);
 
-        refreshTokenManager.putRefreshToken(refreshTokenDto.getUsername(), jwt.getRefreshToken());
+        refreshTokenManager.putRefreshToken(refreshTokenRequest.getUsername(), jwt.getRefreshToken());
 
         return jwt;
     }

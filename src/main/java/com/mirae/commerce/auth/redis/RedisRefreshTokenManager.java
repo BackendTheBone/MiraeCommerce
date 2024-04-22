@@ -11,8 +11,8 @@ public class RedisRefreshTokenManager implements RefreshTokenManager {
     private final RedisRefreshTokenRepository redisRefreshTokenRepository;
 
     @Override
-    public void putRefreshToken(String username, String uuid) {
-        redisRefreshTokenRepository.save(new RefreshToken(uuid, username));
+    public void putRefreshToken(String username, String refreshToken) {
+        redisRefreshTokenRepository.save(new RefreshToken(refreshToken, username));
     }
 
     @Override

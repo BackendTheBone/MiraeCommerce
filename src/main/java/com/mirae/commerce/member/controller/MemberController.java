@@ -1,10 +1,11 @@
 package com.mirae.commerce.member.controller;
+import com.mirae.commerce.auth.jwt.JwtRequired;
 import com.mirae.commerce.member.entity.Member;
 import com.mirae.commerce.member.service.MemberService;
-import com.mirae.commerce.member.dto.ConfirmEmailDto;
-import com.mirae.commerce.member.dto.ModifyRequestDto;
-import com.mirae.commerce.member.dto.RegisterRequestDto;
-import com.mirae.commerce.member.dto.WithdrawRequestDto;
+import com.mirae.commerce.member.dto.ConfirmEmailRequest;
+import com.mirae.commerce.member.dto.ModifyRequest;
+import com.mirae.commerce.member.dto.RegisterRequest;
+import com.mirae.commerce.member.dto.WithdrawRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import java.util.List;
 
 @RestController
-@RequestMapping("member")
+@RequestMapping("members")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
@@ -29,38 +30,38 @@ public class MemberController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Boolean> register(RegisterRequestDto registerRequestDto) {
+    public ResponseEntity<Boolean> register(RegisterRequest registerRequest) {
         return new ResponseEntity<>(
-                memberService.register(registerRequestDto),
+                memberService.register(registerRequest),
                 HttpStatus.OK
         );
     }
 
     @PostMapping("/modification")
-    public ResponseEntity<Boolean> modify(ModifyRequestDto modifyRequestDto) {
+    public ResponseEntity<Boolean> modify(@RequestBody @JwtRequired ModifyRequest modifyRequest) {
         return new ResponseEntity<>(
-                memberService.modify(modifyRequestDto),
+                memberService.modify(modifyRequest),
                 HttpStatus.OK
         );
     }
 
     @PostMapping("/withdrawal")
-    public ResponseEntity<Boolean> withdraw(WithdrawRequestDto withdrawRequestDto) {
+    public ResponseEntity<Boolean> withdraw(WithdrawRequest withdrawRequest) {
         String username = (String) RequestContextHolder.getRequestAttributes().getAttribute("username", RequestAttributes.SCOPE_REQUEST);
-        withdrawRequestDto.setUsername(username);
+        withdrawRequest.setUsername(username);
         if (username == null) {
             throw new RuntimeException();
         }
         return new ResponseEntity<>(
-                memberService.withdraw(withdrawRequestDto),
+                memberService.withdraw(withdrawRequest),
                 HttpStatus.OK
         );
     }
 
     @GetMapping("/email-confirm")
-    public ResponseEntity<Boolean> confirmEmail(ConfirmEmailDto confirmEmailDto) {
+    public ResponseEntity<Boolean> confirmEmail(ConfirmEmailRequest confirmEmailRequest) {
         return new ResponseEntity<>(
-                memberService.confirmEmail(confirmEmailDto),
+                memberService.confirmEmail(confirmEmailRequest),
                 HttpStatus.OK
         );
     }

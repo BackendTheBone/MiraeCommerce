@@ -1,5 +1,6 @@
 package com.mirae.commerce.auth.interceptor;
 
+import com.mirae.commerce.auth.utils.UserContextHolder;
 import com.mirae.commerce.common.dto.ErrorCode;
 import com.mirae.commerce.auth.exception.JwtExceptionHandler;
 import com.mirae.commerce.member.exception.MemberExceptionHandler;
@@ -40,10 +41,13 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         // claims는 null이 될 수도 있음. 예외 말고 더 깔끔한 방법은 없는가?
         String username = (String) claims.get("username");
-        memberRepository.findMemberByUsername(username)
+        memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
+        // todo : 없애야함
         request.setAttribute("username", username);
+
+        UserContextHolder.setCurrentUsername(username);
 
         return true;
     }

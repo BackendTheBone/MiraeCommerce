@@ -19,6 +19,6 @@ public class RepositoryTest {
     @Test
     @DisplayName("woals1488 테스트")
     public void testAccount1() {
-        Assertions.assertThat(memberRepository.findMemberByUsername("woals1488").isPresent()).isTrue();
+        Assertions.assertThat(memberRepository.findByUsername("woals1488").isPresent()).isTrue();
     }
 }

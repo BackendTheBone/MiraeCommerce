@@ -19,6 +19,6 @@ public class RedisTest {
         String val = "val1";
         redisRefreshTokenManager.putRefreshToken(key, val);
         String resultVal = redisRefreshTokenManager.getRefreshToken(key);
-        Assertions.assertThat(resultVal).isEqualTo(key);
+        Assertions.assertThat(resultVal).isEqualTo(val);
     }
 }

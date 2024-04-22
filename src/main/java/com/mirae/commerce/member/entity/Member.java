@@ -10,10 +10,13 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate // save 동작 시, null 필드는 반영하지 않고 update
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
+    // TODO. 어노테이션 name 지우기 <- 무슨 뜻?
+    // TODO. 이름수정 <- 무슨 이름?
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Long memberId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "username")
     private String username;
@@ -40,8 +43,8 @@ public class Member {
     private String role;
 
     @Builder
-    public Member(Long memberId, String username, String password, String realname, String email, String phone, String address, String status, String role) {
-        this.memberId = memberId;
+    public Member(Long id, String username, String password, String realname, String email, String phone, String address, String status, String role) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.realname = realname;

@@ -1,11 +1,11 @@
 package com.mirae.commerce.auth.controller;
 
-import com.mirae.commerce.auth.dto.RefreshTokenDto;
-import com.mirae.commerce.auth.dto.LogoutRequestDto;
+import com.mirae.commerce.auth.dto.RefreshTokenRequest;
+import com.mirae.commerce.auth.dto.LogoutRequest;
 import com.mirae.commerce.auth.jwt.Jwt;
 import com.mirae.commerce.auth.service.AuthService;
 import com.mirae.commerce.mail.service.MailService;
-import com.mirae.commerce.auth.dto.LoginRequestDto;
+import com.mirae.commerce.auth.dto.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,28 +18,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    private final MailService mailService;
 
     @PostMapping("/login")
-    public ResponseEntity<Jwt> login(LoginRequestDto loginRequestDto) {
+    public ResponseEntity<Jwt> login(LoginRequest loginRequest) {
         return new ResponseEntity<>(
-                authService.login(loginRequestDto),
+                authService.login(loginRequest),
                 HttpStatus.OK
         );
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Boolean> logout(LogoutRequestDto logoutRequestDto) {
+    public ResponseEntity<Boolean> logout(LogoutRequest logoutRequest) {
         return new ResponseEntity<>(
-                authService.logout(logoutRequestDto),
+                authService.logout(logoutRequest),
                 HttpStatus.OK
         );
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<Jwt> refreshToken(RefreshTokenDto refreshTokenDto) {
+    public ResponseEntity<Jwt> refreshToken(RefreshTokenRequest refreshTokenRequest) {
         return new ResponseEntity<>(
-                authService.refreshToken(refreshTokenDto),
+                authService.refreshToken(refreshTokenRequest),
                 HttpStatus.OK
         );
     }
