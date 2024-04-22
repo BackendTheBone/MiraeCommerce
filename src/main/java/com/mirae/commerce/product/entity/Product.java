@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincreasedment
-    private Long productId;
+    private Long id;
 
     private Long memberId;
     private Integer stock;
@@ -41,8 +41,8 @@ public class Product {
     private LocalDateTime modifiedAt;
 
     @Builder
-    public Product(Long productId, Long memberId, Integer stock, String name, String detail, Integer price, LocalDateTime registeredAt, LocalDateTime modifiedAt) {
-        this.productId = productId;
+    public Product(Long id, Long memberId, Integer stock, String name, String detail, Integer price, LocalDateTime registeredAt, LocalDateTime modifiedAt) {
+        this.id = id;
         this.memberId = memberId;
         this.stock = stock;
         this.name = name;
@@ -53,7 +53,7 @@ public class Product {
     }
 
     public void updateProductData(Long productId, Integer stock, String name, String detail, Integer price){
-        this.productId = productId;
+        this.id = productId;
         if(stock != null){
             this.stock = stock;
         }
@@ -69,7 +69,7 @@ public class Product {
     }
 
     public void updateProductData(ModifyProductRequest modifyProductRequest){
-        this.productId = modifyProductRequest.getProductId();
+        this.id = modifyProductRequest.getProductId();
         if(modifyProductRequest.getStock() != null){
             this.stock = modifyProductRequest.getStock();
         }
@@ -86,7 +86,7 @@ public class Product {
 
     public static GetProductResponse from(Product product){
         return GetProductResponse.builder()
-                .productId(product.getProductId())
+                .productId(product.getId())
                 .memberId(product.getMemberId())
                 .stock(product.getStock())
                 .name(product.getName())
