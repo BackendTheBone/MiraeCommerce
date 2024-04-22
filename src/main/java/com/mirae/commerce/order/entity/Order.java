@@ -19,11 +19,11 @@ public class Order {
     @Column
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    @Column(name="member_id")
+    @Column
     Long memberId;
-    @Column(name="payment_id")
+    @Column
     Long paymentId;
-    @Column(name="ordered_at")
+    @Column
     LocalDateTime orderedAt;
     @Column
     String address;

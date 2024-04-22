@@ -18,30 +18,30 @@ public class CartController {
 
 	/* 로그인 사용자가 장바구니 조회 시 */
 	@GetMapping("/authenticated")
-	public ResponseEntity<List<GetCartResponse>> getCarts(@RequestBody GetAuthenticatedCartsRequest getAuthenticatedCartRequest){
-		List<GetCartResponse> carts = cartService.getCartsRequest(getAuthenticatedCartRequest);
+	public ResponseEntity<List<GetCartItemResponse>> getCart(@RequestBody GetAuthenticatedCartRequest getAuthenticatedCartRequest){
+		List<GetCartItemResponse> carts = cartService.getCartRequest(getAuthenticatedCartRequest);
 		return new ResponseEntity<>(carts, HttpStatus.OK);
 	}
 
 	/* 비로그인 사용자가 장바구니 조회 시 */
 	@GetMapping("/unauthenticated")
-	public ResponseEntity<List<GetCartResponse>> getCarts(@RequestBody GetUnauthenticatedCartsRequest getUnauthenticatedCartRequest) {
-		List<GetCartResponse> carts = cartService.getCartsRequest(getUnauthenticatedCartRequest);
+	public ResponseEntity<List<GetCartItemResponse>> getCart(@RequestBody GetUnauthenticatedCartRequest getUnauthenticatedCartRequest) {
+		List<GetCartItemResponse> carts = cartService.getCartRequest(getUnauthenticatedCartRequest);
 		return new ResponseEntity<>(carts, HttpStatus.OK);
 	}
 	
 	/* 로그인 사용자가 장바구니 추가 시 (비 로그인의 경우 프론트에서 쿠키로 조작) */
 	@PostMapping
-	public ResponseEntity<ApiResponse> addCart(@RequestBody AddCartRequest addCartRequest){
-		cartService.addCartRequest(addCartRequest);
+	public ResponseEntity<ApiResponse> addCartItem(@RequestBody AddCartItemRequest addCartItemRequest){
+		cartService.addCartItemRequest(addCartItemRequest);
 		return new ResponseEntity<>(new ApiResponse(Boolean.TRUE, "장바구니 요청 아이템 추가 성공"), HttpStatus.ACCEPTED);
 	}
 	
 	/* 로그인 사용자가 장바구니 다중 품목 삭제 시*/
 	@DeleteMapping
-	public ResponseEntity<ApiResponse> deleteCart(@RequestBody DeleteCartsRequest deleteCartsRequest){
-		long attemptedCount = deleteCartsRequest.getProductIds().size();
-		long successCount = cartService.deleteCartsRequest(deleteCartsRequest);
+	public ResponseEntity<ApiResponse> deleteCartItems(@RequestBody DeleteCartItemsRequest deleteCartItemsRequest){
+		long attemptedCount = deleteCartItemsRequest.getProductIds().size();
+		long successCount = cartService.deleteCartItemsRequest(deleteCartItemsRequest);
 		if(successCount == attemptedCount)
 			return new ResponseEntity<>(new ApiResponse(Boolean.TRUE, "장바구니 모든 요청 아이템 삭제 성공"), HttpStatus.ACCEPTED);
 		else if(successCount == 0)

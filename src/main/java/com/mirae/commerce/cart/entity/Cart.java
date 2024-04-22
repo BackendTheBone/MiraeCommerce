@@ -19,7 +19,7 @@ public class Cart{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	@Column
-	private String username;
+	private Long memberId;
 	@Embedded
 	private CartItem cartItem;
 

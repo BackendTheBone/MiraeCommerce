@@ -17,9 +17,9 @@ public class OrderItem {
     @Column
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    @Column(name="order_id")
+    @Column
     Long orderId;
-    @Column(name="product_id")
+    @Column
     Long productId;
     @Column
     Integer count;

@@ -18,7 +18,7 @@ public class Payment {
     @Column
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    @Column(name="order_id")
+    @Column
     Long orderId;
     @Column
     Integer amount;

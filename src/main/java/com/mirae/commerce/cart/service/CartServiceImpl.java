@@ -7,6 +7,7 @@ import com.mirae.commerce.cart.entity.Cart;
 import com.mirae.commerce.cart.entity.CartItem;
 import com.mirae.commerce.cart.repository.CartRepository;
 import com.mirae.commerce.common.utils.ListUtil;
+import com.mirae.commerce.member.repository.MemberRepository;
 import com.mirae.commerce.product.entity.Product;
 import com.mirae.commerce.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -22,60 +23,65 @@ import java.util.List;
 @Transactional
 public class CartServiceImpl implements CartService {
 	private final CartRepository cartRepository;
+	private final MemberRepository memberRepository;
 	private final ProductRepository productRepository;
 
 	@Override
-	public long addCarts(String username, String cookie) {
+	public long addCartItems(long memberId, String cookie) {
 		List<Cart> carts = new ArrayList<>();
-		List<CartItem> cartItems = getCartItemList(cookie);
+		List<CartItem> cartItems = getCartItems(cookie);
 		for (CartItem cartItem : cartItems)
-			carts.add(Cart.builder().username(username).cartItem(cartItem).build());
+			carts.add(Cart.builder().memberId(memberId).cartItem(cartItem).build());
 		return add(carts);
 	}
 
 	@Override
-	public long deleteCart(String username, long productId) {
-		return delete(username, List.of(productId));
+	public long deleteCartItem(long memberId, long productId) {
+		return delete(memberId, List.of(productId));
 	}
 
 	@Override
-	public long deleteCarts(String username, List<Long> productIds) {
-		return delete(username, productIds);
+	public long deleteCartItems(long memberId, List<Long> productIds) {
+		return delete(memberId, productIds);
 	}
 
 	@Override
-	public List<GetCartResponse> getCartsRequest(GetAuthenticatedCartsRequest getAuthenticatedCartRequest) {
+	public List<GetCartItemResponse> getCartRequest(GetAuthenticatedCartRequest getAuthenticatedCartRequest) {
 		String username = getAuthenticatedCartRequest.getUsername();
-		List<Cart> carts = cartRepository.findAllByUsername(username);
+		long memberId = memberRepository.findByUsername(username).orElseThrow().getMemberId();
+		List<Cart> carts = cartRepository.findByMemberId(memberId);
 		List<CartItem> cartItems = ListUtil.extractPropertyList(carts, Cart::getCartItem);
-		return createCartResponseList(cartItems);
+		return createCartItemResponses(cartItems);
 	}
 
 	@Override
-	public List<GetCartResponse> getCartsRequest(GetUnauthenticatedCartsRequest getUnauthenticatedCartRequest) {
+	public List<GetCartItemResponse> getCartRequest(GetUnauthenticatedCartRequest getUnauthenticatedCartRequest) {
 		String cookie = getUnauthenticatedCartRequest.getCookie();
-		List<CartItem> cartItems = getCartItemList(cookie);
-		return createCartResponseList(cartItems);
+		List<CartItem> cartItems = getCartItems(cookie);
+		return createCartItemResponses(cartItems);
 	}
 
 	@Override
-	public long addCartRequest(AddCartRequest addCartRequest) {
-		Cart cart = addCartRequest.toEntity();
+	public long addCartItemRequest(AddCartItemRequest addCartItemRequest) {
+		String username = addCartItemRequest.getUsername();
+		long memberId = memberRepository.findByUsername(username).orElseThrow().getMemberId();
+		Cart cart = addCartItemRequest.toEntity(memberId);
 		return add(List.of(cart));
 	}
 
 	@Override
-	public long deleteCartsRequest(DeleteCartsRequest deleteCartsRequest) {
-		String username = deleteCartsRequest.getUsername();
-		List<Long> productIds = deleteCartsRequest.getProductIds();
-		return delete(username, productIds);
+	public long deleteCartItemsRequest(DeleteCartItemsRequest deleteCartItemsRequest) {
+		String username = deleteCartItemsRequest.getUsername();
+		long memberId = memberRepository.findByUsername(username).orElseThrow().getMemberId();
+		List<Long> productIds = deleteCartItemsRequest.getProductIds();
+		return delete(memberId, productIds);
 	}
 
 	private long add(List<Cart> carts) {
-		String username = carts.get(0).getUsername();
+		long memberId = carts.get(0).getMemberId();
 		List<Long> productIds = ListUtil.extractPropertyList(carts, Cart::getProductId);
 		productIds.sort(null);
-		List<Cart> previousList = cartRepository.findAllByUsernameAndCartItemProductIdIn(username, productIds);
+		List<Cart> previousList = cartRepository.findByMemberIdAndCartItemProductIdIn(memberId, productIds);
 		if (!previousList.isEmpty()) {
 			Iterator<Cart> prevIter = previousList.iterator();
 			Cart prev = prevIter.next();
@@ -91,11 +97,11 @@ public class CartServiceImpl implements CartService {
 		return cartRepository.saveAll(carts).size();
 	}
 
-	private long delete(String username, List<Long> productIds) {
-		return cartRepository.deleteAllByUsernameAndCartItemProductIdIn(username, productIds);
+	private long delete(long memberId, List<Long> productIds) {
+		return cartRepository.deleteAllByMemberIdAndCartItemProductIdIn(memberId, productIds);
 	}
 
-	private List<CartItem> getCartItemList(String cookie) {
+	private List<CartItem> getCartItems(String cookie) {
 		List<CartItem> cartItems = new ArrayList<>();
 		ObjectMapper mapper = new ObjectMapper();
 		String[] items;
@@ -114,14 +120,14 @@ public class CartServiceImpl implements CartService {
 		return cartItems;
 	}
 
-	private List<GetCartResponse> createCartResponseList(List<CartItem> cartItems) {
-		List<GetCartResponse> response = new ArrayList<>();
+	private List<GetCartItemResponse> createCartItemResponses(List<CartItem> cartItems) {
+		List<GetCartItemResponse> response = new ArrayList<>();
 		List<Long> productIds = ListUtil.extractPropertyList(cartItems, CartItem::getProductId);
-		List<Product> products = productRepository.findAllByIdIn(productIds);
+		List<Product> products = productRepository.findByIdIn(productIds);
 		for (int i = 0; i < cartItems.size(); i++) {
 			CartItem cartItem = cartItems.get(i);
 			Product product = products.get(i);
-			response.add(GetCartResponse.of(product, cartItem));
+			response.add(GetCartItemResponse.of(product, cartItem));
 		}
 		return response;
 	}

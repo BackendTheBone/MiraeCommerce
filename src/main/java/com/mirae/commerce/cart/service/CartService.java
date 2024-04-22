@@ -5,17 +5,17 @@ import com.mirae.commerce.cart.dto.*;
 import java.util.List;
 
 public interface CartService {
-    long addCarts(String username, String cookie);
+    long addCartItems(long memberId, String cookie);
 
-    long deleteCart(String username, long productId);
+    long deleteCartItem(long memberId, long productId);
 
-    long deleteCarts(String username, List<Long> productIds);
+    long deleteCartItems(long memberId, List<Long> productIds);
 
-    List<GetCartResponse> getCartsRequest(GetAuthenticatedCartsRequest getAuthenticatedCartRequest);
+    List<GetCartItemResponse> getCartRequest(GetAuthenticatedCartRequest getAuthenticatedCartRequest);
 
-    List<GetCartResponse> getCartsRequest(GetUnauthenticatedCartsRequest getUnauthenticatedCartRequest);
+    List<GetCartItemResponse> getCartRequest(GetUnauthenticatedCartRequest getUnauthenticatedCartRequest);
 
-    long addCartRequest(AddCartRequest addCartRequest);
+    long addCartItemRequest(AddCartItemRequest addCartItemRequest);
 
-    long deleteCartsRequest(DeleteCartsRequest deleteCartsRequest);
+    long deleteCartItemsRequest(DeleteCartItemsRequest deleteCartItemsRequest);
 }

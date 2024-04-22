@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class GetAuthenticatedCartsRequest {
+public class GetAuthenticatedCartRequest {
     private String username;
 }

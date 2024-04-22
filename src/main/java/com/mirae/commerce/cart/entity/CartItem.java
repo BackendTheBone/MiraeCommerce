@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItem {
-	@Column(name="product_id")
+	@Column
 	private Long productId;
 	@Column
 	private Long timestamp;

@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Order getUnfinishedOrder(String username, String address){
-        Member member = memberRepository.findByUsername(username);
+        Member member = memberRepository.findByUsername(username).orElseThrow();
         // TODO. ENUM 바꾸기
         Order order = Order.builder().
                 memberId(member.getMemberId()).
