@@ -13,9 +13,9 @@ public class AddCartRequest {
 	private long timestamp;
 	private int count;
 	
-	public Cart toEntity() {
+	public Cart toEntity(long memberId) {
 		return Cart.builder().
-				username(this.username).
+				memberId(memberId).
 				cartItem(new CartItem(productId, timestamp, count)).
 				build();
 	}

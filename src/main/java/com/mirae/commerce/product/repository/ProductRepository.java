@@ -15,18 +15,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByOrderByRegisteredAt(Pageable pageable);
 //    List<Product> findProductByMemberIdOrderByRegisteredAt(Pageable pageable);
 
-    @Query("select p from Product p where p.memberId = (" +
-<<<<<<< HEAD
-            "select m.memberId from Member m where m.username = :username)")
+    @Query("select p from Product p where p.memberId = ("+"select m.id from Member m where m.username = :username)")
     List<Product> findProductListByUsername(Pageable pageable, @Param("username") String username);
 
     List<Product> findByIdIn(List<Long> productIds);
-=======
-            "select m.id from Member m where m.username = :username)")
-    List<Product> findProductListByUsername(Pageable pageable, @Param("username") String username);
-
-    List<Product> findByProductIdIn(List<Long> ids);
-
->>>>>>> 16ab234bc0d75547ce0cc4cc29f59e685a4417a1
 }
 

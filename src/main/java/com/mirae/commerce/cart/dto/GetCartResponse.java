@@ -18,7 +18,7 @@ public class GetCartResponse {
     
     public static GetCartResponse of(Product product, CartItem cartItem) {
     	return GetCartResponse.builder().
-    			productId(product.getProductId()).
+    			productId(product.getId()).
     			name(product.getName()).
     			price(product.getPrice()).
     			stock(product.getStock()).

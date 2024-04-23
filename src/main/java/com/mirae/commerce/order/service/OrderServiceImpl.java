@@ -54,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
         Member member = memberRepository.findByUsername(username).orElseThrow();
         // TODO. ENUM 바꾸기
         Order order = Order.builder().
-                memberId(member.getMemberId()).
+                memberId(member.getId()).
                 orderedAt(LocalDateTime.now()).
                 address(address).
                 status("0").

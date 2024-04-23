@@ -48,7 +48,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public List<GetCartItemResponse> getCartRequest(GetAuthenticatedCartRequest getAuthenticatedCartRequest) {
 		String username = getAuthenticatedCartRequest.getUsername();
-		long memberId = memberRepository.findByUsername(username).orElseThrow().getMemberId();
+		long memberId = memberRepository.findByUsername(username).orElseThrow().getId();
 		List<Cart> carts = cartRepository.findByMemberId(memberId);
 		List<CartItem> cartItems = ListUtil.extractPropertyList(carts, Cart::getCartItem);
 		return createCartItemResponses(cartItems);
@@ -64,7 +64,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public long addCartItemRequest(AddCartItemRequest addCartItemRequest) {
 		String username = addCartItemRequest.getUsername();
-		long memberId = memberRepository.findByUsername(username).orElseThrow().getMemberId();
+		long memberId = memberRepository.findByUsername(username).orElseThrow().getId();
 		Cart cart = addCartItemRequest.toEntity(memberId);
 		return add(List.of(cart));
 	}
@@ -72,7 +72,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public long deleteCartItemsRequest(DeleteCartItemsRequest deleteCartItemsRequest) {
 		String username = deleteCartItemsRequest.getUsername();
-		long memberId = memberRepository.findByUsername(username).orElseThrow().getMemberId();
+		long memberId = memberRepository.findByUsername(username).orElseThrow().getId();
 		List<Long> productIds = deleteCartItemsRequest.getProductIds();
 		return delete(memberId, productIds);
 	}
