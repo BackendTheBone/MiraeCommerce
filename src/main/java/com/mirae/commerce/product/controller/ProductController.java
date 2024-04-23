@@ -76,26 +76,4 @@ public class ProductController {
 
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
-
-
-
-    //S3
-    // 이미지
-    private final ImageService imageService;
-
-//    @PostMapping("/imageUpload")
-//    public ResponseEntity<List<String>> uploadFiles(@RequestBody List<MultipartFile> multipartFileList, Long productId){
-//
-//        return ResponseEntity.ok(imageService.uploadFiles(multipartFileList, productId));
-//    }
-//
-//
-//    @DeleteMapping("/images/{productId}")
-//    public ResponseEntity<?> deleteAllImages(@PathVariable("productId") Long productId){
-//        return imageService.deleteProductAllImage(productId);
-//    }
-
-
-
-
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Table
+@Table(name="`order`")
 @Entity
 @Getter
 @Builder
