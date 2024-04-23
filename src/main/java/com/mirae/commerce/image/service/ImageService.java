@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ImageService {
-    List<String> uploadFiles(List<MultipartFile> multipartFileList, Long productId);
+    String uploadFiles(MultipartFile multipartFileList, String locationUrl);
 
     void removeS3Img(String deleteSrc);
     @Transactional

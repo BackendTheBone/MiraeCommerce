@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @Table (name = "Product")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 //Audi라는게 감시하다라는 뜻이며 시간을 자동으로 값을 넣어줌
 @EntityListeners(value = {AuditingEntityListener.class})
 public class Product {
@@ -52,22 +54,7 @@ public class Product {
         this.modifiedAt = modifiedAt;
     }
 
-    public void updateProductData(Long productId, Integer stock, String name, String detail, Integer price){
-        this.id = productId;
-        if(stock != null){
-            this.stock = stock;
-        }
-        if(name != null){
-            this.name = name;
-        }
-        if(detail != null){
-            this.detail = detail;
-        }
-        if(price != null) {
-            this.price = price;
-        }
-    }
-
+    // Entity modifyProductRequest에 productId가 종속되어있다.
     public void updateProductData(ModifyProductRequest modifyProductRequest){
         this.id = modifyProductRequest.getProductId();
         if(modifyProductRequest.getStock() != null){
@@ -84,17 +71,6 @@ public class Product {
         }
     }
 
-    public static GetProductResponse from(Product product){
-        return GetProductResponse.builder()
-                .productId(product.getId())
-                .memberId(product.getMemberId())
-                .stock(product.getStock())
-                .name(product.getName())
-                .detail(product.getDetail())
-                .price(product.getPrice())
-                .registeredAt(product.getRegisteredAt())
-                .modifiedAt(product.getModifiedAt())
-                .build();
-    }
+
 
 }

@@ -40,45 +40,25 @@ public class ImageServiceImpl implements ImageService {
     private final ProductRepository productRepository;
 
     @Override
-    public List<String> uploadFiles(List<MultipartFile> multipartFileList, Long productId){
-        List<String> fileNameList = new ArrayList<>();
-
-        //ex) 2015/0501/2/sequence
-        LocalDate localDate = LocalDate.now();
-        int year = localDate.getYear();
-        int month = localDate.getMonthValue();
-        int day = localDate.getDayOfMonth();
-        StringBuilder location = new StringBuilder();
-        location.append(bucket).append("/").append(year).append("/").append(month).append(day).append("/").append(productId);
-
-
-        multipartFileList.forEach((file) -> {
+    public String uploadFiles(MultipartFile multipartFile, String locationUrl){
 
             // 파일 이름을 UUID로 섞어서 사용할 예정
-            String fileName = createFileName(file.getOriginalFilename());
+            String fileName = createFileName(multipartFile.getOriginalFilename());
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
+            objectMetadata.setContentLength(multipartFile.getSize());
+            objectMetadata.setContentType(multipartFile.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()){
-                amazonS3.putObject(new PutObjectRequest(location.toString(), fileName, inputStream, objectMetadata));
+            String imageUrl = "";
+            try(InputStream inputStream = multipartFile.getInputStream()){
+                amazonS3.putObject(new PutObjectRequest(locationUrl, fileName, inputStream, objectMetadata));
                 // ex) url : https://ssafy11mirae.s3.ap-northeast-2.amazonaws.com/2024/413/5/658beefc-a591-4e6c-8339-b3ea3ed497bc.jpg
-                String imageUrl = amazonS3.getUrl(location.toString(), fileName).toString();
-                AddProductImageRequest addImage = AddProductImageRequest.builder()
-                        .productId(productId)
-                        .src(imageUrl)
-                        .build();
-
-                Image imageEntity = addImage.toEntity();
-                add(imageEntity);
+                imageUrl = amazonS3.getUrl(locationUrl, fileName).toString();
             } catch(IOException e){
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일업로드 실패");
             }
 
-            fileNameList.add(fileName);
-        });
 
-        return fileNameList;
+        return imageUrl;
     }
 
     @Override
@@ -126,11 +106,6 @@ public class ImageServiceImpl implements ImageService {
         } catch(StringIndexOutOfBoundsException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 파일 형식");
         }
-    }
-
-    //이미지 추가
-    private Image add(Image image){
-        return imageRepository.save(image);
     }
 
     //S3 productId랑 관련된 애들 다 삭제

@@ -19,7 +19,7 @@ public class AddProductRequest {
     private Integer price;
     private List<MultipartFile> multipartFileList;
 
-    public Product toProductEntity(){
+    public Product toEntity(){
         Product product = Product.builder()
                 .memberId(this.memberId)
                 .stock(this.stock)

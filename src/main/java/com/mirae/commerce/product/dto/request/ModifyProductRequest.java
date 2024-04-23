@@ -1,5 +1,6 @@
 package com.mirae.commerce.product.dto.request;
 
+import com.mirae.commerce.product.entity.Product;
 import jakarta.persistence.Lob;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,5 @@ public class ModifyProductRequest {
 
     //추가할 img들
     private List<MultipartFile> addProductImgList;
-
 
 }

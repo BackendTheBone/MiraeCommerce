@@ -39,7 +39,7 @@ public class GetProductResponse {
 
 
         return GetProductResponse.builder()
-                .productId(product.getProductId())
+                .productId(product.getId())
                 .memberId(product.getMemberId())
                 .stock(product.getStock())
                 .name(product.getName())

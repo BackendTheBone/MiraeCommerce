@@ -19,5 +19,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "select m.memberId from Member m where m.username = :username)")
     List<Product> findProductListByUsername(Pageable pageable, @Param("username") String username);
 
+    List<Product> findByIdIn(List<Long> productIds);
 }
 
