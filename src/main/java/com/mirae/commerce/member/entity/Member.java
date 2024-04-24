@@ -7,7 +7,6 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
-@DynamicUpdate // save 동작 시, null 필드는 반영하지 않고 update
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     // TODO. 어노테이션 name 지우기 <- 무슨 뜻?

@@ -68,8 +68,8 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByUsername(modifyRequest.getUsername())
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
-        modifyRequest.setId(member.getId());
-        memberRepository.save(modifyRequest.toEntity());
+        member = modifyRequest.toEntity(member);
+        memberRepository.save(member);
         return true;
     }
 
