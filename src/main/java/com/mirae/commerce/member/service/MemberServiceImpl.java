@@ -14,6 +14,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -63,13 +64,13 @@ public class MemberServiceImpl implements MemberService {
         return true;
     }
 
+    @Transactional
     @Override
     public boolean modify(ModifyRequest modifyRequest) {
         Member member = memberRepository.findByUsername(modifyRequest.getUsername())
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
-        member = modifyRequest.toEntity(member);
-        memberRepository.save(member);
+        member.update(modifyRequest.toEntity());
         return true;
     }
 

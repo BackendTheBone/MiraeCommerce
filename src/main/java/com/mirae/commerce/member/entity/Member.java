@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
+@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     // TODO. 어노테이션 name 지우기 <- 무슨 뜻?
@@ -64,7 +65,49 @@ public class Member {
         return true;
     }
 
+    public void update(Member m) {
+        updatePassword(m.password);
+        updateRealname(m.realname);
+        updateEmail(m.email);
+        updatePhone(m.phone);
+        updateAddress(m.address);
+        updateStatus(m.status);
+        updateRole(m.role);
+    }
+
+    public void updatePassword(String password) {
+        if (password != null) {
+            this.password = password;
+        }
+    }
+    public void updateRealname(String realname) {
+        if (realname != null) {
+            this.realname = realname;
+        }
+    }
+    public void updateEmail(String email) {
+        if (email != null) {
+            this.email = email;
+        }
+    }
+    public void updatePhone(String phone) {
+        if (phone != null) {
+            this.phone = phone;
+        }
+    }
+    public void updateAddress(String address) {
+        if (address != null) {
+            this.address = address;
+        }
+    }
     public void updateStatus(String status) {
-        this.status = status;
+        if (status != null) {
+            this.status = status;
+        }
+    }
+    public void updateRole(String role) {
+        if (role != null) {
+            this.role = role;
+        }
     }
 }
