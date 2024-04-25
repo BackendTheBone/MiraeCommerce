@@ -14,32 +14,32 @@ public class Member {
     // TODO. 이름수정 <- 무슨 이름?
 
     @Id
+    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "username")
+    @Column
     private String username;
 
-    @Column(name = "password")
+    @Column
     private String password;
 
-    @Column(name = "realname")
+    @Column
     private String realname;
 
-    @Column(name = "email")
+    @Column
     private String email;
 
-    @Column(name = "phone")
+    @Column
     private String phone;
 
-    @Column(name = "address")
+    @Column
     private String address;
 
-    @Column(name = "status")
+    @Column
     private String status;
 
-    @Column(name = "role")
+    @Column
     private String role;
 
     @Builder
