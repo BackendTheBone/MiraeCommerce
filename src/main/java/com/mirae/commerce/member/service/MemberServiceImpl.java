@@ -1,5 +1,6 @@
 package com.mirae.commerce.member.service;
 
+import com.mirae.commerce.auth.utils.UserContextHolder;
 import com.mirae.commerce.common.dto.ErrorCode;
 import com.mirae.commerce.member.entity.Member;
 import com.mirae.commerce.member.repository.MemberRepository;
@@ -7,7 +8,7 @@ import com.mirae.commerce.member.exception.MemberExceptionHandler;
 import com.mirae.commerce.mail.service.MailService;
 import com.mirae.commerce.common.config.WebConfig;
 import com.mirae.commerce.member.dto.ConfirmEmailRequest;
-import com.mirae.commerce.member.dto.ModifyRequest;
+import com.mirae.commerce.member.dto.UpdateRequest;
 import com.mirae.commerce.member.dto.RegisterRequest;
 import com.mirae.commerce.member.dto.WithdrawRequest;
 import jakarta.mail.MessagingException;
@@ -26,6 +27,12 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final MailService mailService;
     private final EmailConfirmationManager emailConfirmationManager;
+
+    @Override
+    public Member findMemberByUsername(String username) {
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
+    }
 
     @Override
     public List<Member> getMemberList() {
@@ -66,17 +73,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public boolean modify(ModifyRequest modifyRequest) {
-        Member member = memberRepository.findByUsername(modifyRequest.getUsername())
+    public boolean update(UpdateRequest updateRequest) {
+        Member member = memberRepository.findByUsername(updateRequest.getUsername())
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
-        member.update(modifyRequest.toEntity());
+        member.update(updateRequest.toEntity());
         return true;
     }
 
     @Override
-    public boolean withdraw(WithdrawRequest withdrawRequest) {
-        Member member = memberRepository.findByUsername(withdrawRequest.getUsername())
+    public boolean withdraw(String username) {
+        // TODO : 권한 검사 필요해보임
+
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
 
         memberRepository.delete(member);
@@ -100,5 +109,11 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
 
         return true;
+    }
+
+    @Override
+    public Member getAuthenticatedMember() {
+        return memberRepository.findByUsername(UserContextHolder.getCurrentUsername())
+                .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
     }
 }

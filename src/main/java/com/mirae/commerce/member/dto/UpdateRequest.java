@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ModifyRequest {
+public class UpdateRequest {
     private Long id;
     private String username;
     private String password;
