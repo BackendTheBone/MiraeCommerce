@@ -21,14 +21,14 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleMemberException(MemberExceptionHandler e) {
         log.error("memberException", e);
         final ErrorResponse response = ErrorResponse.of(e.getErrorCode(), e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, e.getErrorCode().getStatus());
     }
 
     @ExceptionHandler(JwtExceptionHandler.class)
     protected ResponseEntity<ErrorResponse> handleJwtException(JwtExceptionHandler e) {
         log.error("jwtException", e);
         final ErrorResponse response = ErrorResponse.of(e.getErrorCode(), e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(response, e.getErrorCode().getStatus());
     }
 
     @ExceptionHandler(NullPointerException.class)
