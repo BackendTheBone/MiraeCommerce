@@ -31,7 +31,8 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendMail(MimeMessage message) {
         try {
-            javaMailSender.send(message);
+            // TODO: 임시 차단
+            //javaMailSender.send(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
