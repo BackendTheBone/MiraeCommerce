@@ -13,20 +13,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("api")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
-    @GetMapping("/members")
-    public ResponseEntity<Member> getAuthenticatedMember() {
+    @PostMapping("/member")
+    public ResponseEntity<Boolean> createMember(@RequestBody RegisterRequest registerRequest) {
         return new ResponseEntity<>(
-                memberService.getAuthenticatedMember(),
+                memberService.register(registerRequest),
                 HttpStatus.OK
         );
     }
 
-    @GetMapping("/members/{username}")
+    @PutMapping("/member")
+    public ResponseEntity<Boolean> updateMember(@RequestBody UpdateRequest updateRequest) {
+        return new ResponseEntity<>(
+                memberService.update(updateRequest),
+                HttpStatus.OK
+        );
+    }
+
+    @DeleteMapping("/member/{username}")
+    public ResponseEntity<Boolean> deleteMember(@PathVariable("username") String username) {
+        return new ResponseEntity<>(
+                memberService.withdraw(username),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/member/{username}")
     public ResponseEntity<Member> getMember(@PathVariable("username") String username) {
         return new ResponseEntity<>(
                 memberService.findMemberByUsername(username),
@@ -42,31 +58,15 @@ public class MemberController {
         );
     }
 
-    @PostMapping("/members")
-    public ResponseEntity<Boolean> signupMember(RegisterRequest registerRequest) {
+    @GetMapping("/member")
+    public ResponseEntity<Member> getAuthenticatedMember() {
         return new ResponseEntity<>(
-                memberService.register(registerRequest),
+                memberService.getAuthenticatedMember(),
                 HttpStatus.OK
         );
     }
 
-    @PutMapping("/members")
-    public ResponseEntity<Boolean> updateMember(@RequestBody @JwtRequired UpdateRequest updateRequest) {
-        return new ResponseEntity<>(
-                memberService.update(updateRequest),
-                HttpStatus.OK
-        );
-    }
-
-    @DeleteMapping("/members/{username}")
-    public ResponseEntity<Boolean> deleteMember(@PathVariable("username") String username) {
-        return new ResponseEntity<>(
-                memberService.withdraw(username),
-                HttpStatus.OK
-        );
-    }
-
-    @PatchMapping("/email-confirm")
+    @PatchMapping("/member/email-confirmation")
     public ResponseEntity<Boolean> confirmEmail(ConfirmEmailRequest confirmEmailRequest) {
         return new ResponseEntity<>(
                 memberService.confirmEmail(confirmEmailRequest),

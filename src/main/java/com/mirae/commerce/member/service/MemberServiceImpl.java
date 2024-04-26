@@ -10,7 +10,6 @@ import com.mirae.commerce.common.config.WebConfig;
 import com.mirae.commerce.member.dto.ConfirmEmailRequest;
 import com.mirae.commerce.member.dto.UpdateRequest;
 import com.mirae.commerce.member.dto.RegisterRequest;
-import com.mirae.commerce.member.dto.WithdrawRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

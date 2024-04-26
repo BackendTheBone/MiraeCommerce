@@ -4,7 +4,6 @@ import com.mirae.commerce.member.entity.Member;
 import com.mirae.commerce.member.dto.ConfirmEmailRequest;
 import com.mirae.commerce.member.dto.UpdateRequest;
 import com.mirae.commerce.member.dto.RegisterRequest;
-import com.mirae.commerce.member.dto.WithdrawRequest;
 
 import java.util.List;
 
