@@ -7,39 +7,39 @@ import com.mirae.commerce.auth.service.AuthService;
 import com.mirae.commerce.mail.service.MailService;
 import com.mirae.commerce.auth.dto.LoginRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<Jwt> login(LoginRequest loginRequest) {
-        return new ResponseEntity<>(
-                authService.login(loginRequest),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                // TODO : 쿠키 생성 적용하기
+                // .header(headerName, headerValue)
+                .body(authService.login(loginRequest));
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/auth/logout")
     public ResponseEntity<Boolean> logout(LogoutRequest logoutRequest) {
-        return new ResponseEntity<>(
-                authService.logout(logoutRequest),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                // TODO : 쿠키 삭제 적용하기
+                // .header(headerName, headerValue)
+                .body(authService.logout(logoutRequest));
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/auth/refresh")
     public ResponseEntity<Jwt> refreshToken(RefreshTokenRequest refreshTokenRequest) {
-        return new ResponseEntity<>(
-                authService.refreshToken(refreshTokenRequest),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(authService.refreshToken(refreshTokenRequest));
     }
 }

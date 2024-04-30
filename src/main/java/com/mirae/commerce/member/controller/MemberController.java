@@ -13,64 +13,50 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/member")
+    @PostMapping("/members")
     public ResponseEntity<Boolean> createMember(@RequestBody RegisterRequest registerRequest) {
-        return new ResponseEntity<>(
-                memberService.register(registerRequest),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(memberService.register(registerRequest));
     }
 
-    @PutMapping("/member")
+    @PatchMapping("/members")
     public ResponseEntity<Boolean> updateMember(@RequestBody UpdateRequest updateRequest) {
-        return new ResponseEntity<>(
-                memberService.update(updateRequest),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(memberService.update(updateRequest));
     }
 
-    @DeleteMapping("/member/{username}")
+    @DeleteMapping("/members/{username}")
     public ResponseEntity<Boolean> deleteMember(@PathVariable("username") String username) {
-        return new ResponseEntity<>(
-                memberService.withdraw(username),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(memberService.withdraw(username));
     }
 
-    @GetMapping("/member/{username}")
+    @GetMapping("/members{username}")
     public ResponseEntity<Member> getMember(@PathVariable("username") String username) {
-        return new ResponseEntity<>(
-                memberService.findMemberByUsername(username),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(memberService.findMemberByUsername(username));
     }
 
     @GetMapping("/members")
     public ResponseEntity<List<Member>> getMemberList() {
-        return new ResponseEntity<>(
-                memberService.getMemberList(),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(memberService.getMemberList());
     }
 
-    @GetMapping("/member")
+    @GetMapping("/members/get-authenticated")
     public ResponseEntity<Member> getAuthenticatedMember() {
-        return new ResponseEntity<>(
-                memberService.getAuthenticatedMember(),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(memberService.getAuthenticatedMember());
     }
 
-    @PatchMapping("/member/email-confirmation")
+    @PatchMapping("/members/confirm-email")
     public ResponseEntity<Boolean> confirmEmail(ConfirmEmailRequest confirmEmailRequest) {
-        return new ResponseEntity<>(
-                memberService.confirmEmail(confirmEmailRequest),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok()
+                .body(memberService.confirmEmail(confirmEmailRequest));
     }
 }
