@@ -25,7 +25,7 @@ public class MemberController {
     }
 
     @PatchMapping("/members")
-    public ResponseEntity<Boolean> updateMember(@RequestBody UpdateRequest updateRequest) {
+    public ResponseEntity<Boolean> updateMember(@JwtRequired @RequestBody UpdateRequest updateRequest) {
         return ResponseEntity.ok()
                 .body(memberService.update(updateRequest));
     }
@@ -36,7 +36,14 @@ public class MemberController {
                 .body(memberService.withdraw(username));
     }
 
-    @GetMapping("/members{username}")
+
+    @DeleteMapping("/members")
+    public ResponseEntity<Boolean> deleteRequestorMember() {
+        return ResponseEntity.ok()
+                .body(memberService.withdraw(username));
+    }
+
+    @GetMapping("/members/{username}")
     public ResponseEntity<Member> getMember(@PathVariable("username") String username) {
         return ResponseEntity.ok()
                 .body(memberService.findMemberByUsername(username));

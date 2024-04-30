@@ -27,7 +27,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new JwtExceptionHandler(ErrorCode.JWT_TOKEN_NOT_FOUND_ERROR);
+            return true;
+            // TODO : 토큰이 없는 경우 일단 예외를 던지지 않고 UserContextHolder가 null을 들고 있도록 한다.
+            // throw new JwtExceptionHandler(ErrorCode.JWT_TOKEN_NOT_FOUND_ERROR);
         }
 
         String token = authorizationHeader.substring(7);
@@ -43,9 +45,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         String username = (String) claims.get("username");
         memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
-
-        // todo : 없애야함
-        request.setAttribute("username", username);
 
         UserContextHolder.setCurrentUsername(username);
 
