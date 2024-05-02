@@ -1,5 +1,7 @@
 package com.mirae.commerce.member.controller;
+import com.mirae.commerce.auth.dto.LogoutRequest;
 import com.mirae.commerce.auth.jwt.JwtRequired;
+import com.mirae.commerce.auth.jwt.JwtUsernameInject;
 import com.mirae.commerce.member.entity.Member;
 import com.mirae.commerce.member.service.MemberService;
 import com.mirae.commerce.member.dto.ConfirmEmailRequest;
@@ -24,8 +26,9 @@ public class MemberController {
                 .body(memberService.register(registerRequest));
     }
 
+    @JwtRequired
     @PatchMapping("/members")
-    public ResponseEntity<Boolean> updateMember(@RequestBody UpdateRequest updateRequest) {
+    public ResponseEntity<Boolean> updateMember(@JwtUsernameInject @RequestBody UpdateRequest updateRequest) {
         return ResponseEntity.ok()
                 .body(memberService.update(updateRequest));
     }
@@ -36,7 +39,7 @@ public class MemberController {
                 .body(memberService.withdraw(username));
     }
 
-    @GetMapping("/members{username}")
+    @GetMapping("/members/{username}")
     public ResponseEntity<Member> getMember(@PathVariable("username") String username) {
         return ResponseEntity.ok()
                 .body(memberService.findMemberByUsername(username));
