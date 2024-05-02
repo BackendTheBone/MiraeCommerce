@@ -39,7 +39,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new JwtExceptionHandler(ErrorCode.JWT_TOKEN_NOT_FOUND_ERROR);
+            return false;
         }
 
         String token = authorizationHeader.substring(7);

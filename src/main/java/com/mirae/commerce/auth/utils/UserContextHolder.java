@@ -9,10 +9,12 @@ public class UserContextHolder {
     private static final ThreadLocal<String> currentUsername = ThreadLocal.withInitial(() -> null);
 
     public static String getCurrentUsername() {
+        /*
         if (UserContextHolder.currentUsername.get() != null) {
             // TODO : 에러코드 만들고 교체하기
             throw new JwtExceptionHandler(ErrorCode.JWT_TOKEN_NOT_FOUND_ERROR);
         }
+        */
         return UserContextHolder.currentUsername.get();
     }
     public static void setCurrentUsername(String currentUsername) {
