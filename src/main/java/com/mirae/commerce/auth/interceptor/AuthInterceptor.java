@@ -2,6 +2,7 @@ package com.mirae.commerce.auth.interceptor;
 
 import com.mirae.commerce.auth.exception.JwtExceptionHandler;
 import com.mirae.commerce.auth.jwt.JwtRequired;
+import com.mirae.commerce.auth.utils.RefreshTokenHolder;
 import com.mirae.commerce.auth.utils.UserContextHolder;
 import com.mirae.commerce.common.dto.ErrorCode;
 import com.mirae.commerce.member.exception.MemberExceptionHandler;
@@ -9,10 +10,11 @@ import com.mirae.commerce.auth.jwt.JwtProvider;
 import com.mirae.commerce.member.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import org.apache.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -37,12 +39,22 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return false;
+        String token = null;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("accessToken")) {
+                    token = cookie.getValue();
+                }
+                if (cookie.getName().equals("refreshToken")) {
+                    RefreshTokenHolder.setRefreshToken(cookie.getValue());
+                }
+            }
         }
 
-        String token = authorizationHeader.substring(7);
+        if (token == null) {
+            throw new JwtExceptionHandler(ErrorCode.JWT_TOKEN_NOT_FOUND_ERROR);
+        }
 
         Claims claims = null;
         try {

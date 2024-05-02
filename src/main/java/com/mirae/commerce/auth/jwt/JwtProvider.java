@@ -1,5 +1,7 @@
 package com.mirae.commerce.auth.jwt;
 
+import com.mirae.commerce.auth.exception.JwtExceptionHandler;
+import com.mirae.commerce.common.dto.ErrorCode;
 import com.mirae.commerce.common.utils.RSAKeyManager;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -44,11 +46,17 @@ public class JwtProvider {
 
     public Claims getClaims(String token) throws ExpiredJwtException {
         PublicKey publicKey = rsaKeyManager.loadPublicKey();
-        return (Claims) Jwts.parser()
-                .verifyWith(publicKey)
-                .build()
-                .parse(token)
-                .getPayload();
+        try {
+            return (Claims) Jwts.parser()
+                    .verifyWith(publicKey)
+                    .build()
+                    .parse(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JwtExceptionHandler("Error occurred while parsing access token", ErrorCode.JWT_ERROR);
+        }
     }
 
     public Date getExpireDateAccessToken() {

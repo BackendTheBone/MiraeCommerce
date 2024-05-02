@@ -4,6 +4,8 @@ import com.mirae.commerce.auth.dto.RefreshTokenRequest;
 import com.mirae.commerce.auth.dto.LogoutRequest;
 import com.mirae.commerce.auth.jwt.Jwt;
 import com.mirae.commerce.auth.jwt.JwtRequired;
+import com.mirae.commerce.auth.jwt.JwtUsernameInject;
+import com.mirae.commerce.auth.jwt.RefreshTokenInject;
 import com.mirae.commerce.auth.service.AuthService;
 import com.mirae.commerce.auth.dto.LoginRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,24 +23,61 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/auth/login")
-    public ResponseEntity<Jwt> login(LoginRequest loginRequest) {
+    public ResponseEntity<?> login(LoginRequest loginRequest) {
+        Jwt jwt = authService.login(loginRequest);
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", jwt.getAccessToken())
+                .httpOnly(true)
+                .path("/")
+                .build();
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", jwt.getRefreshToken())
+                .httpOnly(true)
+                .path("/api/auth/refresh-token")
+                .build();
+
         return ResponseEntity.ok()
-                // TODO : 쿠키 생성 적용하기
-                // .header(headerName, headerValue)
-                .body(authService.login(loginRequest));
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(true);
     }
 
+    @JwtRequired
     @PostMapping("/auth/logout")
-    public ResponseEntity<Boolean> logout(LogoutRequest logoutRequest) {
+    public ResponseEntity<Boolean> logout(@JwtUsernameInject LogoutRequest logoutRequest) {
+        authService.logout(logoutRequest);
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .path("/api/auth/refresh-token")
+                .maxAge(0)
+                .build();
+
         return ResponseEntity.ok()
-                // TODO : 쿠키 삭제 적용하기
-                // .header(headerName, headerValue)
-                .body(authService.logout(logoutRequest));
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(true);
     }
 
-    @PostMapping("/auth/refresh")
-    public ResponseEntity<Jwt> refreshToken(RefreshTokenRequest refreshTokenRequest) {
+    @JwtRequired
+    @PostMapping("/auth/refresh-token")
+    public ResponseEntity<Boolean> refreshToken(@JwtUsernameInject @RefreshTokenInject RefreshTokenRequest refreshTokenRequest) {
+        Jwt jwt = authService.refreshToken(refreshTokenRequest);
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", jwt.getAccessToken())
+                .httpOnly(true)
+                .path("/")
+                .build();
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", jwt.getRefreshToken())
+                .httpOnly(true)
+                .path("/api/auth/refresh-token")
+                .build();
+
         return ResponseEntity.ok()
-                .body(authService.refreshToken(refreshTokenRequest));
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(true);
     }
 }
