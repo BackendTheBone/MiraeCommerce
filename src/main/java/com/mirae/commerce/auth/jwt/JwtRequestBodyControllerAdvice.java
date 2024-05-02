@@ -1,6 +1,5 @@
 package com.mirae.commerce.auth.jwt;
 
-import com.mirae.commerce.auth.jwt.JwtRequired;
 import com.mirae.commerce.auth.utils.UserContextHolder;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;

@@ -3,6 +3,7 @@ package com.mirae.commerce.auth.controller;
 import com.mirae.commerce.auth.dto.RefreshTokenRequest;
 import com.mirae.commerce.auth.dto.LogoutRequest;
 import com.mirae.commerce.auth.jwt.Jwt;
+import com.mirae.commerce.auth.jwt.JwtRequired;
 import com.mirae.commerce.auth.service.AuthService;
 import com.mirae.commerce.mail.service.MailService;
 import com.mirae.commerce.auth.dto.LoginRequest;
