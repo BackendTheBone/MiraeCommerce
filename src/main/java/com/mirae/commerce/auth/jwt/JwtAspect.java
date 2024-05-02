@@ -1,6 +1,7 @@
 package com.mirae.commerce.auth.jwt;
 
 import com.mirae.commerce.auth.exception.JwtExceptionHandler;
+import com.mirae.commerce.auth.utils.RefreshTokenHolder;
 import com.mirae.commerce.auth.utils.UserContextHolder;
 import com.mirae.commerce.common.dto.ErrorCode;
 import org.aspectj.lang.JoinPoint;
@@ -26,20 +27,27 @@ public class JwtAspect {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
 
-        for (Annotation[] annotations : methodSignature.getMethod().getParameterAnnotations()) {
-            for (int i=0; i<annotations.length; i++) {
-                if (!annotations[i].annotationType().equals(JwtUsernameInject.class)) {
-                    continue;
+        Annotation[][] annotations = methodSignature.getMethod().getParameterAnnotations();
+        for (int i=0; i<annotations.length; i++) {
+            for (Annotation annotation : annotations[i]) {
+                if (annotation.annotationType().equals(JwtUsernameInject.class)) {
+                    try {
+                        Method usernameSetter = args[i].getClass().getMethod("setUsername", String.class);
+                        usernameSetter.invoke(args[i], UserContextHolder.getCurrentUsername());
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        throw new JwtExceptionHandler("Failed to inject username", ErrorCode.JWT_ERROR);
+                    }
                 }
 
-                try {
-                    Method usernameSetter = args[i].getClass().getMethod("setUsername", String.class);
-                    usernameSetter.invoke(args[i], UserContextHolder.getCurrentUsername());
-                    break;
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    throw new JwtExceptionHandler("Failed to inject username", ErrorCode.JWT_ERROR);
+                if (annotation.annotationType().equals(RefreshTokenInject.class)) {
+                    try {
+                        Method refreshTokenSetter = args[i].getClass().getMethod("setRefreshToken", String.class);
+                        refreshTokenSetter.invoke(args[i], RefreshTokenHolder.getRefreshToken());
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        throw new JwtExceptionHandler("Failed to inject refreshToken", ErrorCode.JWT_ERROR);
+                    }
                 }
             }
-        };
+        }
     }
 }
