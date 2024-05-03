@@ -1,5 +1,6 @@
 package com.mirae.commerce.auth.interceptor;
 
+import com.mirae.commerce.auth.Role;
 import com.mirae.commerce.auth.exception.JwtExceptionHandler;
 import com.mirae.commerce.auth.jwt.JwtRequired;
 import com.mirae.commerce.auth.utils.RefreshTokenHolder;
@@ -34,10 +35,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        if (handlerMethod.getMethodAnnotation(JwtRequired.class) == null) {
+        JwtRequired methodAnnotation = ((HandlerMethod) handler).getMethodAnnotation(JwtRequired.class);
+        if (methodAnnotation == null) {
             return true;
         }
+
+        Role restrictedRole = methodAnnotation.role();
 
         String token = null;
 
@@ -68,8 +71,13 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         String username = (String) claims.get("username");
-        memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR));
+        Role role = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberExceptionHandler(ErrorCode.USERNAME_NOT_FOUND_ERROR))
+                .getRole();
+
+        if (!(role == Role.ADMIN || role == restrictedRole)) {
+            throw new JwtExceptionHandler("permission denied", ErrorCode.JWT_ERROR);
+        }
 
         UserContextHolder.setCurrentUsername(username);
 

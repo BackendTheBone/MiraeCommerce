@@ -1,5 +1,6 @@
 package com.mirae.commerce.member.dto;
 
+import com.mirae.commerce.auth.Role;
 import com.mirae.commerce.member.entity.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class RegisterRequest {
     private String phone;
     private String address;
     private String status;
-    private String role;
+    private Role role;
 
     public Member toEntity() {
         return Member.builder()

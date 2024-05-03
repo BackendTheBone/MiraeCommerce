@@ -1,6 +1,7 @@
 package com.mirae.commerce.member.entity;
 
 
+import com.mirae.commerce.auth.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -39,11 +40,12 @@ public class Member {
     @Column
     private String status;
 
+    @Enumerated(value = EnumType.STRING)
     @Column
-    private String role;
+    private Role role;
 
     @Builder
-    public Member(Long id, String username, String password, String realname, String email, String phone, String address, String status, String role) {
+    public Member(Long id, String username, String password, String realname, String email, String phone, String address, String status, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -105,7 +107,7 @@ public class Member {
             this.status = status;
         }
     }
-    public void updateRole(String role) {
+    public void updateRole(Role role) {
         if (role != null) {
             this.role = role;
         }

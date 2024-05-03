@@ -1,5 +1,5 @@
 package com.mirae.commerce.member.controller;
-import com.mirae.commerce.auth.dto.LogoutRequest;
+import com.mirae.commerce.auth.Role;
 import com.mirae.commerce.auth.jwt.JwtRequired;
 import com.mirae.commerce.auth.jwt.JwtUsernameInject;
 import com.mirae.commerce.member.entity.Member;
@@ -8,7 +8,6 @@ import com.mirae.commerce.member.dto.ConfirmEmailRequest;
 import com.mirae.commerce.member.dto.UpdateRequest;
 import com.mirae.commerce.member.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,7 @@ public class MemberController {
                 .body(memberService.register(registerRequest));
     }
 
-    @JwtRequired
+    @JwtRequired(role = Role.USER)
     @PatchMapping("/members")
     public ResponseEntity<Boolean> updateMember(@JwtUsernameInject @RequestBody UpdateRequest updateRequest) {
         return ResponseEntity.ok()
@@ -45,6 +44,7 @@ public class MemberController {
                 .body(memberService.findMemberByUsername(username));
     }
 
+    @JwtRequired(role = Role.ADMIN)
     @GetMapping("/members")
     public ResponseEntity<List<Member>> getMemberList() {
         return ResponseEntity.ok()
