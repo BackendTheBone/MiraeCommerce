@@ -53,18 +53,18 @@ public class AuthServiceImpl implements AuthService {
     public Jwt refreshToken(RefreshTokenRequest refreshTokenRequest) {
         String storedRefreshToken = refreshTokenManager.getRefreshToken(refreshTokenRequest.getUsername());
 
-        // TODO : storedRefreshToken null 예외 추가 할 것
-        if (storedRefreshToken == null) return null;
+        if (storedRefreshToken == null) {
+            throw new JwtExceptionHandler(ErrorCode.EXPIRED_REFRESH_TOKEN_EXCEPTION);
+        }
 
         try {
             jwtProvider.getClaims(refreshTokenRequest.getRefreshToken());
         } catch (ExpiredJwtException e) {
-            throw new JwtExceptionHandler(ErrorCode.EXPIRED_REFRESH_TOKEN_EXCEPTION);
+            throw new JwtExceptionHandler("Refresh token does not match", ErrorCode.JWT_ERROR);
         }
 
         if (!storedRefreshToken.equals(refreshTokenRequest.getRefreshToken())) {
-            // TODO : refresh token 불일치 예외 추가 할 것
-            return null;
+            throw new JwtExceptionHandler("No matching refresh token found", ErrorCode.JWT_ERROR);
         }
 
         Map<String, Object> claims = new HashMap<>();

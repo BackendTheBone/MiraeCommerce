@@ -14,50 +14,50 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/members")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/members")
+    @PostMapping
     public ResponseEntity<Boolean> createMember(@RequestBody RegisterRequest registerRequest) {
         return ResponseEntity.ok()
                 .body(memberService.register(registerRequest));
     }
 
     @JwtRequired(role = Role.USER)
-    @PatchMapping("/members")
+    @PatchMapping
     public ResponseEntity<Boolean> updateMember(@JwtUsernameInject @RequestBody UpdateRequest updateRequest) {
         return ResponseEntity.ok()
                 .body(memberService.update(updateRequest));
     }
 
-    @DeleteMapping("/members/{username}")
+    @DeleteMapping("/{username}")
     public ResponseEntity<Boolean> deleteMember(@PathVariable("username") String username) {
         return ResponseEntity.ok()
                 .body(memberService.withdraw(username));
     }
 
-    @GetMapping("/members/{username}")
+    @GetMapping("/{username}")
     public ResponseEntity<Member> getMember(@PathVariable("username") String username) {
         return ResponseEntity.ok()
                 .body(memberService.findMemberByUsername(username));
     }
 
     @JwtRequired(role = Role.ADMIN)
-    @GetMapping("/members")
+    @GetMapping
     public ResponseEntity<List<Member>> getMemberList() {
         return ResponseEntity.ok()
                 .body(memberService.getMemberList());
     }
 
-    @GetMapping("/members/get-authenticated")
+    @GetMapping("/get-authenticated")
     public ResponseEntity<Member> getAuthenticatedMember() {
         return ResponseEntity.ok()
                 .body(memberService.getAuthenticatedMember());
     }
 
-    @PatchMapping("/members/confirm-email")
+    @PatchMapping("/confirm-email")
     public ResponseEntity<Boolean> confirmEmail(ConfirmEmailRequest confirmEmailRequest) {
         return ResponseEntity.ok()
                 .body(memberService.confirmEmail(confirmEmailRequest));

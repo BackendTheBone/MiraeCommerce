@@ -18,62 +18,53 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        Jwt jwt = authService.login(loginRequest);
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", jwt.getAccessToken())
-                .httpOnly(true)
-                .path("/")
-                .build();
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", jwt.getRefreshToken())
-                .httpOnly(true)
-                .path("/api/auth/refresh-token")
-                .build();
+    // TODO : 추후 적절한 상수 관리법을 찾아 그곳에 위치시키기
+    private static final String ACCESS_TOKEN_COOKIE_KEY = "accessToken";
+    private static final String REFRESH_TOKEN_COOKIE_KEY = "refreshToken";
+    private static final long DEFAULT_ACCESS_TOKEN_COOKIE_MAX_AGE = 1800L;
+    private static final long DEFAULT_REFRESH_TOKEN_COOKIE_MAX_AGE = 60L * 60 * 24 * 30;
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(true);
+    @PostMapping("/login")
+    public ResponseEntity<Boolean> login(@RequestBody LoginRequest loginRequest) {
+        return buildJwtResponse(
+                authService.login(loginRequest),
+                DEFAULT_ACCESS_TOKEN_COOKIE_MAX_AGE,
+                DEFAULT_REFRESH_TOKEN_COOKIE_MAX_AGE
+        );
     }
 
     @JwtRequired
-    @PostMapping("/auth/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Boolean> logout(@JwtUsernameInject LogoutRequest logoutRequest) {
         authService.logout(logoutRequest);
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", "")
-                .httpOnly(true)
-                .path("/")
-                .maxAge(0)
-                .build();
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .path("/api/auth/refresh-token")
-                .maxAge(0)
-                .build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(true);
+        return buildJwtResponse(new Jwt("", ""), 0L, 0L);
     }
 
     @JwtRequired
-    @PostMapping("/auth/refresh-token")
+    @PostMapping("/refresh-token")
     public ResponseEntity<Boolean> refreshToken(@JwtUsernameInject @RefreshTokenInject RefreshTokenRequest refreshTokenRequest) {
-        Jwt jwt = authService.refreshToken(refreshTokenRequest);
+        return buildJwtResponse(
+                authService.refreshToken(refreshTokenRequest),
+                DEFAULT_ACCESS_TOKEN_COOKIE_MAX_AGE,
+                DEFAULT_REFRESH_TOKEN_COOKIE_MAX_AGE
+        );
+    }
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", jwt.getAccessToken())
+    private ResponseEntity<Boolean> buildJwtResponse(Jwt jwt, long accessTokenMaxAge, long refreshTokenMaxAge) {
+        ResponseCookie accessTokenCookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE_KEY, jwt.getAccessToken())
                 .httpOnly(true)
                 .path("/")
+                .maxAge(accessTokenMaxAge)
                 .build();
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", jwt.getRefreshToken())
+        ResponseCookie refreshTokenCookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE_KEY, jwt.getRefreshToken())
                 .httpOnly(true)
                 .path("/api/auth/refresh-token")
+                .maxAge(refreshTokenMaxAge)
                 .build();
 
         return ResponseEntity.ok()
